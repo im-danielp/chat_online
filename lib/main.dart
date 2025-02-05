@@ -11,9 +11,13 @@ void main() async {
   await Firebase.initializeApp();
 
   FirebaseFirestore.instance
-      .collection('col')
-      .doc('doc')
-      .set({'texto': 'Daniel'});
+      .collection('mensagens')
+      .doc('msg1')
+      .collection('arquivos')
+      .doc()
+      .set({
+    'arqname': 'foto.png',
+  });
 }
 
 class MyApp extends StatelessWidget {
