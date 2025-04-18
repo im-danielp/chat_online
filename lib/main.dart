@@ -3,21 +3,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+// Firebase chatFlutter.
 void main() async {
-  // Firebase chatFlutter.
-
-  runApp(const MyApp());
-
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   FirebaseFirestore.instance
+      //
       .collection('mensagens')
       .doc('msg1')
       .snapshots()
       .listen((doc) {
-    // print(doc.data());
+    //
   });
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

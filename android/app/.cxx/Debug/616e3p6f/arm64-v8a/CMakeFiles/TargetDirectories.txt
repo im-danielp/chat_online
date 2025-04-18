@@ -1,0 +1,2 @@
+E:/Apps/udemy_ciolffi/chat_online/android/app/.cxx/Debug/616e3p6f/arm64-v8a/CMakeFiles/edit_cache.dir
+E:/Apps/udemy_ciolffi/chat_online/android/app/.cxx/Debug/616e3p6f/arm64-v8a/CMakeFiles/rebuild_cache.dir

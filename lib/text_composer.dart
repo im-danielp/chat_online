@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class TextComposer extends StatefulWidget {
-  final Function(String) sendMessage;
+  final Function({String? text, File? imgFile}) sendMessage;
 
   const TextComposer({
     super.key,
@@ -18,9 +21,7 @@ class _TextComposerState extends State<TextComposer> {
 
   void reset() {
     controller.clear();
-    setState(() {
-      isComposing = false;
-    });
+    setState(() => isComposing = false);
   }
 
   @override
@@ -28,7 +29,14 @@ class _TextComposerState extends State<TextComposer> {
     return Row(
       children: [
         IconButton(
-          onPressed: () {},
+          onPressed: () async {
+            final XFile? pickImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+            if (pickImage == null) return;
+
+            // Converte de XFile para File, aceito pelo Firebase.
+            final File imgFile = File(pickImage.path);
+            widget.sendMessage(imgFile: imgFile);
+          },
           icon: const Icon(Icons.camera_alt_rounded),
         ),
         Expanded(
@@ -38,12 +46,10 @@ class _TextComposerState extends State<TextComposer> {
               hintText: 'Enviar mensagem',
             ),
             onChanged: (text) {
-              setState(() {
-                isComposing = text.isNotEmpty;
-              });
+              setState(() => isComposing = text.isNotEmpty);
             },
             onSubmitted: (text) {
-              widget.sendMessage(text);
+              widget.sendMessage(text: text);
               reset();
             },
           ),
@@ -51,7 +57,7 @@ class _TextComposerState extends State<TextComposer> {
         IconButton(
           onPressed: isComposing
               ? () {
-                  widget.sendMessage(controller.text);
+                  widget.sendMessage(text: controller.text);
                   reset();
                 }
               : null,
