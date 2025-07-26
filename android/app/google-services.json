@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "64032262506-pe25jc6f2h0ngc8iqmacupces35dtsm0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.chat_online",
+            "certificate_hash": "f63d0353eb85e69090de02cc8f595eaf5f52bd03"
+          }
+        },
+        {
           "client_id": "64032262506-vk44jd9jjmuonq6hsnf590qr2ur21o4a.apps.googleusercontent.com",
           "client_type": 3
         }
