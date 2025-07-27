@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:chat_online_novo/chat_message.dart';
 import 'package:chat_online_novo/text_composer.dart';
+import 'package:chat_online_novo/utilities/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -52,40 +54,42 @@ class _ChatScreenState extends State<ChatScreen> {
 
   /// Salva o texto no FireBase.
   void sendMessage({String? text, File? imgFile}) async {
-    final user = await getUser();
+    try {
+      final user = await getUser();
 
-    if (user == null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Não foi possível fazer o login. Tente novamente!'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
+      if (user == null && mounted) {
+        snackbarErro(context, msg: 'Não foi possível fazer o login. Tente novamente!');
+      }
+
+      Map<String, dynamic> data = {
+        'uid': user?.uid ?? '',
+        'senderName': user?.displayName ?? '',
+        'senderPhotoUrl': user?.photoURL ?? '',
+      };
+
+      if (imgFile != null) {
+        UploadTask task = FirebaseStorage.instance
+            .ref()
+            .child('${DateTime.now().microsecondsSinceEpoch.toString()}.jpg')
+            .putFile(imgFile);
+
+        TaskSnapshot taskSnapshot = await task;
+        String url = await taskSnapshot.ref.getDownloadURL();
+        data['imageUrl'] = url;
+      }
+
+      if (text != null) {
+        data['text'] = text;
+        data['createdAt'] = FieldValue.serverTimestamp();
+      }
+
+      FirebaseFirestore.instance.collection('messages').add(data);
+    } catch (e) {
+      if (mounted) {
+        snackbarErro(context, msg: 'Não foi possível enviar sua mensagem!');
+        log('sendMessage catch - $e');
+      }
     }
-
-    Map<String, dynamic> data = {
-      'uid': user?.uid ?? '',
-      'sender': user?.displayName ?? '',
-      'senderPhotoUrl': user?.photoURL ?? '',
-    };
-
-    if (imgFile != null) {
-      UploadTask task = FirebaseStorage.instance
-          .ref()
-          .child('${DateTime.now().microsecondsSinceEpoch.toString()}.jpg')
-          .putFile(imgFile);
-
-      TaskSnapshot taskSnapshot = await task;
-      String url = await taskSnapshot.ref.getDownloadURL();
-      data['imageUrl'] = url;
-    }
-
-    if (text != null) {
-      data['text'] = text;
-      data['createdAt'] = FieldValue.serverTimestamp();
-    }
-
-    FirebaseFirestore.instance.collection('messages').add(data);
   }
 
   @override
@@ -116,14 +120,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   );
                 }
 
-                List<DocumentSnapshot> documents = snapshot.data!.docs;
+                final List<DocumentSnapshot> documents = snapshot.data!.docs;
                 return ListView.builder(
                   itemCount: documents.length,
                   reverse: true,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(documents[index].get('text')),
-                    );
+                    final data = documents[index].data() as Map<String, dynamic>;
+                    return ChatMessage(data: data, mine: true);
                   },
                 );
               },

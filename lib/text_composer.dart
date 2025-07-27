@@ -41,10 +41,13 @@ class _TextComposerState extends State<TextComposer> {
         ),
         Expanded(
           child: TextField(
+            textCapitalization: TextCapitalization.sentences,
             controller: controller,
             decoration: const InputDecoration.collapsed(
               hintText: 'Enviar mensagem',
             ),
+            maxLines: 5,
+            minLines: 1,
             onChanged: (text) {
               setState(() => isComposing = text.isNotEmpty);
             },

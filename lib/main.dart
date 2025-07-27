@@ -11,7 +11,6 @@ void main() async {
   FirebaseFirestore.instance
       //
       .collection('mensagens')
-      .doc('msg1')
       .snapshots()
       .listen((doc) {
     //
